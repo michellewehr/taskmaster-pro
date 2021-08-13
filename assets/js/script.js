@@ -151,6 +151,71 @@ $(".list-group").on("blur", "input[type= 'text']", function() {
   $(this).replaceWith(taskSpan);
 })
 
+//MOVE LIST ITEMS/ sort them into different card elements (to do, in progress, in review, done)
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolderance: "pointer",
+  //helper: clone- tells jquery to create a copy of the dragged element and move the copy instead of the original. necessary to prevent click events from accidently triggering on the original element
+  helper: "clone",
+  //added eent listeners- activate, over, and out
+  activate: function(event) {
+    console.log("deactivate", this);
+  },
+  out: function(event) {
+    console.log("over", event.target);
+  },
+  update: function(event) {
+    //array to store the task data in 
+    var tempArr = [];
+    //loop over current set of children in sortable list
+    $(this).children().each(function() {
+      var text = $(this)
+        .find("p")
+        .text()
+        .trim();
+      var date = $(this)
+        .find("span")
+        .text()
+        .trim()
+      
+      //add task data to the temp array as an object
+      tempArr.push({
+        text: text,
+        date: date
+      });
+    });
+
+    //GET TASKS TO STAY IN COLUMN DRAGGED TO
+    //trim down list's ID to match objet property
+    var arrName = $(this)
+      .attr("id")
+      .replace("list-", "");
+
+    //update array on tasks object and save
+    tasks[arrName] = tempArr;
+    saveTasks();
+  }
+});
+
+//TRASH DRAG AND DROP COMPONENT
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolderance: "touch",
+  drop: function(event, ui) {
+    console.log("drop");
+    ui.draggable.remove();
+  },
+  over: function(event, ui) {
+    console.log("over");
+  },
+  out: function(event, ui) {
+    console.log("out");
+  }
+})
+
+
+
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
   // clear values
