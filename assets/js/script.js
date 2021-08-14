@@ -13,6 +13,8 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  //check due date
+  auditTask(taskLi);
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
@@ -60,13 +62,12 @@ $(".list-group").on("click", "p", function() {
   textInput.trigger("focus");
 })
 
-//this blur event will trigger as soon as the user interacts with anything other than the textarea element. wehn that happens we need to collect - data, current value of element, parent element's id and the elements position in the list. these data points will help us udate the correct task in the tasks object
+//this blur event will trigger as soon as the user interacts with anything other than the textarea element. wehn that happens we need to collect - data, current value of element, parent element's id and the elements position in the list. these data points will help us udate the correct task in the tasks object 
 $(".list-group").on("blur", "textarea", function() {
   // get the textarea's current value/text
   //.val is value
   //trim diminishes white space (deleted .trim() to match code snippet)
   var text = $(this).val();
-  
 
   // get the parent ul's id attribute
   // attr is returning the ID which will be "lis-" followed by the category
@@ -101,27 +102,30 @@ $(".list-group").on("blur", "textarea", function() {
 //due date was clicked
 $(".list-group").on("click", "span", function() {
   //get current text
-  var date = $(this)
-    .text()
-    .trim();
+  var date = $(this).text().trim();
 
   //create new input element
-  var dateInput = $("<input>")
-
-    // attr() method set up as type = "text". attr() serves 2 purposes: 1 argument it gets an attribute (ex: attr("id")) and with 2 arguments it sets an attribute (ex: attr("type", "text"))
-    .attr("type", "text")
-    .addClass("form-control")
-    .val(date);
+  var dateInput = $("<input>").attr("type", "text").addClass("form-control").val(date);
+  // ^^ attr() method set up as type = "text". attr() serves 2 purposes: 1 argument it gets an attribute (ex: attr("id")) and with 2 arguments it sets an attribute (ex: attr("type", "text"))
 
   //swap out elements
   $(this).replaceWith(dateInput);
+
+  //enable jquery ui datepicker
+  dateInput.datepicker({
+    minDate: 1,
+    onClose: function() {
+      //when calendar is closed, force a "change" event on the dateInput
+      $(this).trigger("change");
+    }
+  });
 
   //automatically focus on new element
   dateInput.trigger("focus");
 })
 
-//value of due date was changed
-$(".list-group").on("blur", "input[type= 'text']", function() {
+//value of due date was changed -- changed .on("blur") to .on("change", "input[type'text']", function()) so that the date changes
+$(".list-group").on("change", "input[type= 'text']", function() {
   //get current text
   var date = $(this)
     .val()
@@ -149,6 +153,9 @@ $(".list-group").on("blur", "input[type= 'text']", function() {
 
   //replace input with span element
   $(this).replaceWith(taskSpan);
+
+  //pass task's li element into auditTask() to check new due date
+  auditTask($(taskSpan).closest(".list-group-item"));
 })
 
 //MOVE LIST ITEMS/ sort them into different card elements (to do, in progress, in review, done)
@@ -214,7 +221,33 @@ $("#trash").droppable({
   }
 })
 
+//DATE PICKER
+$("#modalDueDate").datepicker({
+  minDate: 1
+});
 
+//AUDIT TASK FUNCTION 
+// in audit task function ew can get the date info and parse it into a moment object using moment.js. we use jquery to select the taskel element and find the span element inside of it, then retrieve the text value using .text(). we chained .trim() to cute off any possible leading or trailing empty spaces **Pro tip: use trim() when reading form values to ensure no unnecessary empty spaces are in beg/end of string
+var auditTask = function(taskEl) {
+  //to ensure element is getting to the function
+  console.log(taskEl);
+  // get date from task element
+  var date = $(taskEl).find("span").text().trim();
+  //ensure it worked
+  // console.log(date);
+
+  //convert to moment object at 5:00pm. once we hace the date info and store it in date variable wehave to pass that value into moment() function to turn into moment object. we specified date, "L" coz the date var doesn't specify time of day and will default to 12am- converted to 5pm using "hour", 17 in .set() method
+  var time = moment(date, "L").set("hour", 17);
+  // this should print out an object for the value of the date variable, but at 5:00pm of that date
+  // console.log(time);
+
+  //apply new class if task is near/over due date -- note Math.abs ensures we're getting the absolute value of that number
+  if (moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+  } else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+  }
+};
 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
@@ -249,6 +282,9 @@ $("#task-form-modal .btn-primary").click(function() {
     saveTasks();
   }
 });
+
+
+
 
 // remove all tasks
 $("#remove-tasks").on("click", function() {
