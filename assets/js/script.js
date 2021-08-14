@@ -115,7 +115,7 @@ $(".list-group").on("click", "span", function() {
   dateInput.datepicker({
     minDate: 1,
     onClose: function() {
-      //when calendar is closed, force a "change" event on the dateInput
+      //when calendar is closed, force a "change" event on the dateInput. the onChange method forces change event on the dateInput whenever the user closes the date
       $(this).trigger("change");
     }
   });
