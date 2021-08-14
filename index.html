@@ -20,11 +20,11 @@
   <div class="row min-vh-100 no-gutters">
     <header class="col-12 col-lg-3 bg-dark sticky-top text-light d-flex flex-column p-4 p-lg-3">
       <h1 class="text-center"> <span class="oi oi-task d-inline d-lg-none"></span>Taskmaster Pro Edition</h1>
-      <button id="create-task" class="btn btn-block btn-success" data-toggle="modal" data-target="#task-form-modal">
+      <button id="create-task" class="btn btn-block btn-add" data-toggle="modal" data-target="#task-form-modal">
         <span class="oi oi-plus mr-2"></span>Add Task
         <!--^^ added mr-2 for some right margin-->
       </button>
-      <button id="remove-tasks" class="btn btn-block btn-danger">
+      <button id="remove-tasks" class="btn btn-block btn-delete">
         <span class="oi oi-trash mr-2"></span>Delete All Tasks</button>
         <span class="oi oi-task display-1 text-center mb-2 d-none d-lg-block mt-auto"></span>
         <!-- ^^^ mt-auto is margin top auto, telling screens not to display it when its small,but still want to see it somewhere in the mobile so we added another in h1 tag-->
@@ -33,6 +33,8 @@
         laudantium sequi fugit officiis optio deleniti asperiores rem eius laborum maxime blanditiis culpa, quis iste?
       </p>
     </header>
+
+
     <main class="col-12 col-lg-9 d-flex flex-column">
       <div class="m-5 row justify-content-around">
       <!--To Do start-->
@@ -89,9 +91,9 @@
         <!--done end-->
       </div>
       <!--trash component-->
-      <div id="trash"class="mt-auto">
-        <div class="w-100 bg-danger p-3 text-center text-light display-4">
-          <span class="oi oi-trash"></span>
+      <div id="trash"class="mt-auto overflow-hidden">
+        <div class="w-100 p-3 text-center bottom-trash">
+          <span class="oi oi-trash mx-auto mb-4"></span>
           Drop Here to Remove.
         </div>
       </div>
@@ -123,8 +125,8 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save Task</button>
+          <button type="button" class="btn btn-close" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-save">Save Task</button>
         </div>
       </div>
     </div>
